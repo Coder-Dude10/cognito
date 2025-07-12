@@ -16,11 +16,11 @@ Brainfk++ is a low-level programming language comprised of 22 instructions, with
 | [ | If **currentCellValue** == 0, goto cell after corresponding ']' instruction. | currentCellValue |
 | ] | If **currentCellValue** != 0, goto cell after corresponding '[' instruction. | currentCellValue |
 | , | Set the value of the current cell to the keycode of the key currently being pressed (none = 0, leftJoystickLeft = 1, leftJoystickRight = 2, leftJoystickUp = 3, leftJoystickDown = 4, A = 5, B = 6, X = 7, Y = 8) (**mode** == 0) or set the value of the current and next cell to leftJoystickX and leftJoystickY, respectively (**mode** == 1). | mode |
-| . | Create an object that retreives its attributes (**objectIndex**, **objectType** (integer = 0, character = 1, sprite = 2), **objectColor**, **x**, **y**) from the current and following cells and updates itself when said cells are modified, or set the background to **objectIndex** (**objectType** == 3). **NOTE**: Sprites and audio files must be named "\<integer\>.png" and backgrounds must be named "\<integer greater than zero\>.png". | objectIndex, objectType, x, y |
+| . | Create an object that retreives its attributes (**objectIndex**, **objectType** (integer = 0, character = 1, sprite = 2), **objectColor**, **x**, **y**) from the current and following cells and updates itself when said cells are modified, or set the background to **objectIndex** (**objectType** == 3). **NOTE:** Sprites and audio files must be named "\<integer\>.png" and backgrounds must be named "\<integer greater than zero\>.png". | objectIndex, objectType, x, y |
 | ; | End of program branch. | - |
 | : | Destroy all objects. | - |
 | ? | Set the value of the current cell to a random integer from 0 to **maximumIntegerValue**. | maximumIntegerValue |
-| ! | Play the audio file at **audioIndex** as a sound (doesn't loop and is played at 50% volume) if its length is less than 30 seconds. Otherwise, play said audio file as music (loops and is played at 100% volume). **NOTE**: Only WAV files are supported. | audioIndex |
+| ! | Play the audio file at **audioIndex** as a sound (doesn't loop and is played at 50% volume) if its length is less than 30 seconds. Otherwise, play said audio file as music (loops and is played at 100% volume). **NOTE:** Only WAV files are supported. | audioIndex |
 | ~ | Pause for (**duration** / 10) seconds. | duration |
 | ^ | Set the cell pointer to **cellIndex**. | cellIndex |
 | = | Set the value of the current cell to the value of the cell at **cellIndex**. | cellIndex |
