@@ -25,7 +25,7 @@ Brainfk++ is a low-level programming language comprised of 22 instructions, with
 | ^ | Set the cell pointer to **cellIndex**. | cellIndex |
 | = | Set the value of the current cell to the value of the cell at **cellIndex**. | cellIndex |
 | # | Set the value of the current cell to either 0 (**currentCellValue** != 0) or 1 (**currentCellValue** == 0). | currentCellValue |
-| ▏| Set the value of the current cell to either 0 (**currentCellValue** < 0) or 1 (**currentCellValue** > -1). | currentCellValue |
+| \| | Set the value of the current cell to either 0 (**currentCellValue** < 0) or 1 (**currentCellValue** > -1). | currentCellValue |
 | @ | Execute the program branch at **programTreeIndex**. | programTreeIndex |
 | / | Set the value of the buffer cell to **currentCellValue**. | currentCellValue |
 | \ | Set the value of the current cell to the value of the buffer cell. | - |
