@@ -5,7 +5,7 @@ A game engine for Nintendo Switches/Switch Lites/Switch OLEDs running Atmosphèr
 [Download the Latest Release](https://github.com/Coder-Dude10/cognito/releases)
 # Brainfk++
 ![Brainfk++ Logo](https://github.com/Coder-Dude10/cognito/blob/main/Images/Brainfk%2B%2B%20Logo.png?raw=true)
-Brainfk++ is a low-level programming language comprised of 22 instructions, with each instruction represented by an ASCII character. It expands on the work of Urban Müller by introducing more instructions, thereby simplifying the development process and enabling the creation of more complex programs. 
+Brainfk++ is a programming language comprised of 22 instructions, with each instruction represented by an ASCII character. It expands on the work of Urban Müller by introducing more instructions, thereby simplifying the development process and enabling the creation of more complex programs.
 # Brainfk++ Instruction Set
 | Instruction | Description | Parameters |
 | --- | --- | --- |
