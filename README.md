@@ -42,3 +42,5 @@ Brainfk++ is a programming language comprised of 22 instructions, with each inst
 | 4 | Corresponding '[' instruction not found. |
 | 5 | Asset not found. |
 | 6 | Invalid index. |
+# Credits
+This project uses Simple-SDL2-Audio distributed under the Apache License, Version 2.0.
