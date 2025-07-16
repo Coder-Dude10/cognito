@@ -43,7 +43,7 @@ PadState pad;
 SDL_Window* window;
 SDL_Renderer* renderer;
 SDL_Texture* texture;
-SDL_Texture* characters[58];
+SDL_Texture* characters[60];
 SDL_Texture* sprites[16];
 SDL_Texture* backgrounds[16];
 Audio* audio[16];
@@ -163,7 +163,7 @@ void updateScreenIfNeeded() {
 
                         break;
                     case 1:
-                        if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < 48) {
+                        if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < 50) {
                             texture = characters[cells[objectIndices[ii]] + 10];
 
                             if (cells[objectIndices[ii] + 2] > 0) {
@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
     window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     
-    for (int i = 0; i < 58; i++) {
+    for (int i = 0; i < 60; i++) {
         strcpy(assetPath, ("Characters/" + std::__cxx11::to_string(i) + ".png").c_str());
 
         characters[i] = IMG_LoadTexture(renderer, assetPath);
@@ -404,7 +404,7 @@ int main(int argc, char* argv[]) {
 
                 break;
             case '~':
-                cells[currentCell] = timeSet - (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - timeStart) / 100;
+                cells[currentCell] = abs(timeSet - (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - timeStart) / 100);
 
                 updateScreenIfNeeded();
 
@@ -577,7 +577,7 @@ int main(int argc, char* argv[]) {
 
     endAudio();
 
-    for (int i = 0; i < 58; i++) {
+    for (int i = 0; i < 60; i++) {
         SDL_DestroyTexture(characters[i]);
     }
 
