@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
-#include <ctime>
+#include <chrono>
 #include <SDL.h>
 #include <SDL_image.h>
 #include "audio.h"
@@ -22,6 +22,7 @@ int audioCount = 0;
 int objectCount = 0;
 int digitCount = 0;
 int currentBackground = 0;
+int timeSet = 0;
 int cells[256];
 int programTree[5];
 int programTreeTransitionCells[4];
@@ -30,6 +31,7 @@ int powersOfTen[6] = {1, 10, 100, 1000, 10000, 100000};
 int objectTintRComponents[7] = {0, 224, 246, 255, 147, 109, 142};
 int objectTintGComponents[7] = {0, 102, 178, 217, 196, 158, 124};
 int objectTintBComponents[7] = {0, 102, 107, 102, 125, 235, 195};
+long long int timeStart;
 char assetPath[18];
 char program0[256];
 char program1[256];
@@ -45,8 +47,7 @@ SDL_Texture* characters[58];
 SDL_Texture* sprites[16];
 SDL_Texture* backgrounds[16];
 Audio* audio[16];
-SDL_Rect object;
-SDL_Rect background;
+SDL_Rect renderArea;
 
 char readCurrentProgramCell() {
     switch (programTree[currentProgramTreeDepth]) {
@@ -109,10 +110,15 @@ void updateScreenIfNeeded() {
     for (int i = 0; i < objectCount; i++) {
         if (currentCell > objectIndices[i] - 1 && currentCell < objectIndices[i] + 5) {
             SDL_RenderClear(renderer);
-
+            
+            renderArea.x = 0;
+            renderArea.y = 0;
+            renderArea.w = 1280;
+            renderArea.h = 720;
+            
             if (currentBackground > -1 && currentBackground < backgroundCount + 1) {
                 if (currentBackground > 0) {
-                    SDL_RenderCopy(renderer, backgrounds[currentBackground - 1], NULL, &background);
+                    SDL_RenderCopy(renderer, backgrounds[currentBackground], NULL, &renderArea);
                 }
             } else {
                 errorType = 5;
@@ -134,8 +140,10 @@ void updateScreenIfNeeded() {
                         if (cells[objectIndices[ii]] < 0) {
                             digitCount++;
                         }
-
-                        object.y = cells[objectIndices[ii] + 4] * 120;
+                        
+                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                        renderArea.w = 128;
+                        renderArea.h = 120;
 
                         for (int iii = 0; iii < digitCount; iii++) {
                             if (cells[objectIndices[ii]] < 0 && iii == digitCount - 1) {
@@ -148,9 +156,9 @@ void updateScreenIfNeeded() {
                                 SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                             }
 
-                            object.x = (cells[objectIndices[ii] + 3] + digitCount - iii - 1) * 128;
+                            renderArea.x = (cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] + (digitCount - iii - 1) * 128) % 1280;
                             
-                            SDL_RenderCopy(renderer, texture, NULL, &object);
+                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
                         }
 
                         break;
@@ -161,11 +169,12 @@ void updateScreenIfNeeded() {
                             if (cells[objectIndices[ii] + 2] > 0) {
                                 SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                             }
-    
-                            object.x = cells[objectIndices[ii] + 3] * 128;
-                            object.y = cells[objectIndices[ii] + 4] * 120;
                             
-                            SDL_RenderCopy(renderer, texture, NULL, &object);
+                            renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
+                            renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                            
+                            SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
+                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
                         } else {
                             errorType = 5;
                         }
@@ -179,10 +188,11 @@ void updateScreenIfNeeded() {
                                 SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                             }
 
-                            object.x = cells[objectIndices[ii] + 3] * 128;
-                            object.y = cells[objectIndices[ii] + 4] * 120;
+                            renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
+                            renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
                         
-                            SDL_RenderCopy(renderer, texture, NULL, &object);
+                            SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
+                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
                         } else {
                             errorType = 5;
                         }
@@ -198,7 +208,7 @@ void updateScreenIfNeeded() {
 }
 
 int main(int argc, char* argv[]) {
-    srand(time(0));
+    srand(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
     chdir("sdmc:/switch/Cognito");
     padConfigureInput(1, HidNpadStyleSet_NpadStandard);
     padInitializeDefault(&pad);
@@ -216,10 +226,6 @@ int main(int argc, char* argv[]) {
 
     window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    object.w = 128;
-    object.h = 120;
-    background.w = 1280;
-    background.h = 720;
     
     for (int i = 0; i < 58; i++) {
         strcpy(assetPath, ("Characters/" + std::__cxx11::to_string(i) + ".png").c_str());
@@ -370,6 +376,10 @@ int main(int argc, char* argv[]) {
                 objectCount = 0;
 
                 break;
+            case '\"':
+                silenceMusic();
+                
+                break;
             case '?':
                 cells[currentCell] = rand() % (cells[currentCell] + 1);
 
@@ -388,8 +398,15 @@ int main(int argc, char* argv[]) {
                 }
 
                 break;
+            case '`':
+                timeSet = cells[currentCell];
+                timeStart = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+                break;
             case '~':
-                SDL_Delay(abs(cells[currentCell]) * 100);
+                cells[currentCell] = timeSet - (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - timeStart) / 100;
+
+                updateScreenIfNeeded();
 
                 break;
             case '^':
@@ -465,71 +482,71 @@ int main(int argc, char* argv[]) {
         if (errorType > 0) {
             SDL_RenderClear(renderer);
 
-            object.x = 0;
-            object.y = 0;
+            renderArea.x = 0;
+            renderArea.y = 0;
             texture = characters[14];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[27];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
 
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[45];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[errorType];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x = 0;
-            object.y = 120;
+            renderArea.x = 0;
+            renderArea.y = 120;
             texture = characters[18];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[23];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[28];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[45];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[programTree[currentProgramTreeDepth]];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
 
-            object.x += 128;
+            renderArea.x += 128;
             texture = characters[42];
 
             SDL_SetTextureColorMod(texture, 224, 102, 102);
-            SDL_RenderCopy(renderer, texture, NULL, &object);
+            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
             
             if (currentProgramCell == 0) {
                 digitCount = 1;
@@ -542,11 +559,11 @@ int main(int argc, char* argv[]) {
             }
             
             for (int i = 0; i < digitCount; i++) {
-                object.x = (digitCount - i + 5) * 128;
+                renderArea.x = (digitCount - i + 5) * 128;
                 texture = characters[currentProgramCell / powersOfTen[i] % 10];
 
                 SDL_SetTextureColorMod(texture, 224, 102, 102);
-                SDL_RenderCopy(renderer, texture, NULL, &object);
+                SDL_RenderCopy(renderer, texture, NULL, &renderArea);
             }
 
             SDL_RenderPresent(renderer);
