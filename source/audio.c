@@ -118,6 +118,8 @@ static void addAudio(Audio * root, Audio * newAudio);
  */
 static inline void audioCallback(void * userdata, uint8_t * stream, int len);
 
+Audio* currentMusic;
+
 void playSound(const char * filename, int volume)
 {
     playAudio(filename, NULL, 0, volume);
@@ -135,7 +137,13 @@ void playSoundFromMemory(Audio * audio)
 
 void playMusicFromMemory(Audio * audio)
 {
+    currentMusic = audio;
+    
     playAudio(NULL, audio, 1, SDL_MIX_MAXVOLUME);
+}
+
+void silenceMusic() {
+    playAudio(NULL, currentMusic, 1, 0);
 }
 
 void initAudio(void)
