@@ -35,6 +35,8 @@ Brainfk++ is a programming language comprised of 24 instructions, with each inst
 | _ | Skip the next instruction. | - |
 # Brainfk++ Character Set
 ![Brainfk++ Character Set](https://github.com/Coder-Dude10/cognito/blob/main/Images/Brainfk%2B%2B%20Character%20Set.png?raw=true)
+# Brainfk++ Object Tint Colors
+![Brainfk++ Object Tint Colors](https://github.com/Coder-Dude10/cognito/blob/main/Images/Brainfk%2B%2B%20Object%20Tint%20Colors.png?raw=true)
 # Brainfk++ Error Codes
 | Error | Description |
 | --- | --- |
