@@ -21,7 +21,7 @@ Brainfk++ is a programming language comprised of 24 instructions, with each inst
 | : | Destroy all objects. | - |
 | " | Silence music. | - |
 | ? | Set the value of the current cell to a random integer from 0 to **maximumIntegerValue**. | maximumIntegerValue |
-| ! | Play the audio file at **audioIndex** as a sound (doesn't loop and is played at 50% volume) if its length is less than 30 seconds. Otherwise, play said audio file as music (loops and is played at 100% volume). **NOTE:** Only WAV files are supported. | audioIndex |
+| ! | Play the audio file at **audioIndex** as a sound (doesn't loop and is played at 50% volume) if its length is less than 10 seconds. Otherwise, play said audio file as music (loops and is played at 100% volume). Music can play immediately (**fade** == 0), or the current music can fade out before other music fades in (**fade** == 1). **NOTE:** Only WAV files are supported. | audioIndex, fade |
 | ` | Set timer to (**timeSetting** * 100) milliseconds. **NOTE:** The timer will count up once it has reached 0. | timeSetting |
 | ~ | Set the value of the current cell to the time remaining or elapsed in tenths of a second. | - |
 | ^ | Set the cell pointer to **cellIndex**. | cellIndex |
