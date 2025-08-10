@@ -23,21 +23,22 @@ int objectCount = 0;
 int digitCount = 0;
 int currentBackground = 0;
 int timeSet = 0;
-int cells[256];
+int cells[1028];
 int programTree[5];
 int programTreeTransitionCells[4];
-int objectIndices[50];
+int objectIndices[64];
 int powersOfTen[6] = {1, 10, 100, 1000, 10000, 100000};
 int objectTintRComponents[7] = {0, 224, 246, 255, 147, 109, 142};
 int objectTintGComponents[7] = {0, 102, 178, 217, 196, 158, 124};
 int objectTintBComponents[7] = {0, 102, 107, 102, 125, 235, 195};
 long long int timeStart;
 char assetPath[18];
-char program0[256];
-char program1[256];
-char program2[256];
-char program3[256];
-char program4[256];
+char program0[1028];
+char program1[1028];
+char program2[1028];
+char program3[1028];
+char program4[1028];
+bool updateScreen = false;
 
 PadState pad;
 SDL_Window* window;
@@ -109,102 +110,107 @@ int getInputValue(int mode) {
 void updateScreenIfNeeded() {
     for (int i = 0; i < objectCount; i++) {
         if (currentCell > objectIndices[i] - 1 && currentCell < objectIndices[i] + 5) {
-            SDL_RenderClear(renderer);
-            
-            renderArea.x = 0;
-            renderArea.y = 0;
-            renderArea.w = 1280;
-            renderArea.h = 720;
-            
-            if (currentBackground > -1 && currentBackground < backgroundCount + 1) {
-                if (currentBackground > 0) {
-                    SDL_RenderCopy(renderer, backgrounds[currentBackground], NULL, &renderArea);
-                }
-            } else {
-                errorType = 5;
-            }
-
-            for (int ii = 0; ii < objectCount; ii++) {
-                switch (cells[objectIndices[ii] + 1]) {
-                    default:
-                        if (cells[objectIndices[ii]] == 0) {
-                            digitCount = 1;
-                        } else {
-                            for (int iii = 0; iii < 6; iii++) {
-                                if ((double)abs(cells[objectIndices[ii]]) / powersOfTen[iii] >= 0.1) {
-                                    digitCount = iii;
-                                }
-                            }
-                        }
-
-                        if (cells[objectIndices[ii]] < 0) {
-                            digitCount++;
-                        }
-                        
-                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
-                        renderArea.w = 128;
-                        renderArea.h = 120;
-
-                        for (int iii = 0; iii < digitCount; iii++) {
-                            if (cells[objectIndices[ii]] < 0 && iii == digitCount - 1) {
-                                texture = characters[37];
-                            } else {
-                                texture = characters[abs(cells[objectIndices[ii]]) / powersOfTen[iii] % 10];
-                            }
-
-                            if (cells[objectIndices[ii] + 2] > 0 && cells[objectIndices[ii] + 2] < 8) {
-                                SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
-                            }
-
-                            renderArea.x = (cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] + (digitCount - iii - 1) * 128) % 1280;
-                            
-                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
-                        }
-
-                        break;
-                    case 1:
-                        if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < 50) {
-                            texture = characters[cells[objectIndices[ii]] + 10];
-
-                            if (cells[objectIndices[ii] + 2] > 0) {
-                                SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
-                            }
-                            
-                            renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
-                            renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
-                            
-                            SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
-                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
-                        } else {
-                            errorType = 5;
-                        }
-
-                        break;
-                    case 2:
-                        if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < spriteCount) {
-                            texture = sprites[cells[objectIndices[ii]]];
-
-                            if (cells[objectIndices[ii] + 2] > 0) {
-                                SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
-                            }
-
-                            renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
-                            renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
-                        
-                            SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
-                            SDL_RenderCopy(renderer, texture, NULL, &renderArea);
-                        } else {
-                            errorType = 5;
-                        }
-
-                        break;
-                }
-                
-            }
-
-            SDL_RenderPresent(renderer);
+            updateScreen = true;
         }
     }
+
+    if (updateScreen) {
+        SDL_RenderClear(renderer);
+            
+        renderArea.x = 0;
+        renderArea.y = 0;
+        renderArea.w = 1280;
+        renderArea.h = 720;
+            
+        if (currentBackground > -1 && currentBackground < backgroundCount + 1) {
+            if (currentBackground > 0) {
+                SDL_RenderCopy(renderer, backgrounds[currentBackground - 1], NULL, &renderArea);
+            }
+        } else {
+            errorType = 5;
+        }
+
+        for (int ii = 0; ii < objectCount; ii++) {
+            switch (cells[objectIndices[ii] + 1]) {
+                default:
+                    if (cells[objectIndices[ii]] == 0) {
+                        digitCount = 1;
+                    } else {
+                        for (int iii = 0; iii < 6; iii++) {
+                            if ((double)abs(cells[objectIndices[ii]]) / powersOfTen[iii] >= 0.1) {
+                                digitCount = iii;
+                            }
+                        }
+                    }
+
+                    if (cells[objectIndices[ii]] < 0) {
+                        digitCount++;
+                    }
+                        
+                    renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                    renderArea.w = 128;
+                    renderArea.h = 120;
+
+                    for (int iii = 0; iii < digitCount; iii++) {
+                        if (cells[objectIndices[ii]] < 0 && iii == digitCount - 1) {
+                            texture = characters[37];
+                        } else {
+                            texture = characters[abs(cells[objectIndices[ii]]) / powersOfTen[iii] % 10];
+                        }
+
+                        if (cells[objectIndices[ii] + 2] > 0 && cells[objectIndices[ii] + 2] < 8) {
+                            SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
+                        }
+
+                        renderArea.x = (cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] + (digitCount - iii - 1) * 128) % 1280;
+                            
+                        SDL_RenderCopy(renderer, texture, NULL, &renderArea);
+                    }
+
+                    break;
+                case 1:
+                    if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < 50) {
+                        texture = characters[cells[objectIndices[ii]] + 10];
+
+                        if (cells[objectIndices[ii] + 2] > 0) {
+                            SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
+                        }
+                            
+                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
+                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                            
+                        SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
+                        SDL_RenderCopy(renderer, texture, NULL, &renderArea);
+                    } else {
+                        errorType = 5;
+                    }
+
+                    break;
+                case 2:
+                    if (cells[objectIndices[ii]] > -1 && cells[objectIndices[ii]] < spriteCount) {
+                        texture = sprites[cells[objectIndices[ii]]];
+
+                        if (cells[objectIndices[ii] + 2] > 0) {
+                            SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
+                        }
+
+                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
+                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                        
+                        SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
+                        SDL_RenderCopy(renderer, texture, NULL, &renderArea);
+                    } else {
+                        errorType = 5;
+                    }
+
+                    break;
+            }
+        }
+
+        SDL_RenderPresent(renderer);
+    }
+
+    updateScreen = false;
 }
 
 int main(int argc, char* argv[]) {
@@ -258,7 +264,7 @@ int main(int argc, char* argv[]) {
             audioCount = i + 1;
         }
     }
-
+    
     while ((readCurrentProgramCell() != ';' || currentProgramTreeDepth != 0) && getInputValue(0) != 9) {
         switch(readCurrentProgramCell()) {
             case '+':
@@ -357,6 +363,7 @@ int main(int argc, char* argv[]) {
             case '.':
                 if (cells[currentCell + 1] == 3) {
                     currentBackground = cells[currentCell];
+                    updateScreen = true;
                 } else {
                     objectIndices[objectCount] = currentCell;
                     objectCount++;
@@ -388,10 +395,10 @@ int main(int argc, char* argv[]) {
                 break;
             case '!':
                 if (cells[currentCell] > -1 && cells[currentCell] < audioCount) {
-                    if (audio[cells[currentCell]]->length < 5760000) {
+                    if (audio[cells[currentCell]]->length < 1920000) {
                         playSoundFromMemory(audio[cells[currentCell]]);
                     } else {
-                        playMusicFromMemory(audio[cells[currentCell]]);
+                        playMusicFromMemory(audio[cells[currentCell]], cells[currentCell + 1]);
                     }
                 } else {
                     errorType = 5;
