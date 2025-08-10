@@ -110,7 +110,7 @@ void playSoundFromMemory(Audio * audio);
  * @param volume        Volume read playSound for moree
  *
  */
-void playMusicFromMemory(Audio * audio);
+void playMusicFromMemory(Audio * audio, int fade);
 
 void silenceMusic(void);
 
