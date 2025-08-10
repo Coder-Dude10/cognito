@@ -49,9 +49,6 @@
 /* Max number of sounds that can be in the audio queue at anytime, stops too much mixing */
 #define AUDIO_MAX_SOUNDS 25
 
-/* The rate at which the volume fades when musics transition. The higher number indicates music fading faster */
-#define AUDIO_MUSIC_FADE_VALUE SDL_MIX_MAXVOLUME
-
 /* Flags OR'd together, which specify how SDL should behave when a device cannot offer a specific feature
  * If flag is set, SDL will change the format in the actual audio file structure (as opposed to gDevice->want)
  *
@@ -119,6 +116,7 @@ static void addAudio(Audio * root, Audio * newAudio);
 static inline void audioCallback(void * userdata, uint8_t * stream, int len);
 
 Audio* currentMusic;
+int musicFadeValue;
 
 void playSound(const char * filename, int volume)
 {
@@ -135,9 +133,15 @@ void playSoundFromMemory(Audio * audio)
     playAudio(NULL, audio, 0, SDL_MIX_MAXVOLUME);
 }
 
-void playMusicFromMemory(Audio * audio)
+void playMusicFromMemory(Audio * audio, int fade)
 {
     currentMusic = audio;
+
+    if (fade == 0) {
+        musicFadeValue = SDL_MIX_MAXVOLUME;
+    } else {
+        musicFadeValue = SDL_MIX_MAXVOLUME / 10;
+    }
     
     playAudio(NULL, audio, 1, SDL_MIX_MAXVOLUME);
 }
@@ -282,7 +286,7 @@ Audio * createAudio(const char * filename)
     (newAudio->audio).callback = NULL;
     (newAudio->audio).userdata = NULL;
 
-    if (newAudio->length < 5760000) {
+    if (newAudio->length < 1920000) {
         newAudio->loop = 0;
         newAudio->volume = SDL_MIX_MAXVOLUME / 2;
     } else {
@@ -414,13 +418,13 @@ static inline void audioCallback(void * userdata, uint8_t * stream, int len)
 
                 if(audio->volume > 0)
                 {
-                    if(audio->volume - AUDIO_MUSIC_FADE_VALUE < 0)
+                    if(audio->volume - musicFadeValue < 0)
                     {
                         audio->volume = 0;
                     }
                     else
                     {
-                        audio->volume -= AUDIO_MUSIC_FADE_VALUE;
+                        audio->volume -= musicFadeValue;
                     }
                 }
                 else
