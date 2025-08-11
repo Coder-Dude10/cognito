@@ -147,7 +147,7 @@ void updateScreenIfNeeded() {
                         digitCount++;
                     }
                         
-                    renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                    renderArea.y = cells[objectIndices[ii] + 4] * cells[objectIndices[ii] + 6] % 720;
                     renderArea.w = 128;
                     renderArea.h = 120;
 
@@ -162,7 +162,7 @@ void updateScreenIfNeeded() {
                             SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                         }
 
-                        renderArea.x = (cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] + (digitCount - iii - 1) * 128) % 1280;
+                        renderArea.x = (cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] + (digitCount - iii - 1) * 128) % 1280;
                             
                         SDL_RenderCopy(renderer, texture, NULL, &renderArea);
                     }
@@ -176,8 +176,8 @@ void updateScreenIfNeeded() {
                             SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                         }
                             
-                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
-                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 1280;
+                        renderArea.y = cells[objectIndices[ii] + 4] * cells[objectIndices[ii] + 6] % 720;
                             
                         SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
                         SDL_RenderCopy(renderer, texture, NULL, &renderArea);
@@ -194,8 +194,8 @@ void updateScreenIfNeeded() {
                             SDL_SetTextureColorMod(texture, objectTintRComponents[cells[objectIndices[ii] + 2] - 1], objectTintGComponents[cells[objectIndices[ii] + 2] - 1], objectTintBComponents[cells[objectIndices[ii] + 2] - 1]);
                         }
 
-                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 4] % 1280;
-                        renderArea.y = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 720;
+                        renderArea.x = cells[objectIndices[ii] + 3] * cells[objectIndices[ii] + 5] % 1280;
+                        renderArea.y = cells[objectIndices[ii] + 4] * cells[objectIndices[ii] + 6] % 720;
                         
                         SDL_QueryTexture(texture, NULL, NULL, &renderArea.w, &renderArea.h);
                         SDL_RenderCopy(renderer, texture, NULL, &renderArea);
